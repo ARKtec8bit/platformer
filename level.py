@@ -88,7 +88,6 @@ class Level:
             player.speed = 8
 
     def horizontal_movement_collision(self):
-
         player = self.player.sprite
         player.rect.x += player.direction.x * player.speed
 
@@ -102,17 +101,17 @@ class Level:
                     player.rect.right = sprite.rect.left
                     player.on_right = True
                     self.current_x = player.rect.right
+
         if player.on_left and (
             player.rect.left < self.current_x or player.direction.x >= 0
         ):
             player.on_left = False
         if player.on_right and (
-            player.rect.right > self.current_x or player.direction.x >= 0
+            player.rect.right > self.current_x or player.direction.x <= 0
         ):
             player.on_right = False
 
-    def vert_movement_collision(self):
-
+    def vertical_movement_collision(self):
         player = self.player.sprite
         player.apply_gravity()
 
@@ -129,7 +128,7 @@ class Level:
 
         if player.on_ground and player.direction.y < 0 or player.direction.y > 1:
             player.on_ground = False
-        if player.on_ground and player.direction.y > 0:
+        if player.on_ceiling and player.direction.y > 0.1:
             player.on_ceiling = False
 
     def run(self):
@@ -144,6 +143,6 @@ class Level:
         self.player.update()
         self.horizontal_movement_collision()
         self.get_player_on_ground()
-        self.vert_movement_collision()
+        self.vertical_movement_collision()
         self.create_landing_particles()
         self.player.draw(self.display_surface)
