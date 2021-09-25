@@ -3,7 +3,7 @@ from support import import_folder
 
 
 class Player(pygame.sprite.Sprite):
-    def __init__(self, pos, surface):
+    def __init__(self, pos, surface, create_jump_particles):
         super().__init__()
         self.import_character_assets()
         self.frame_index = 0
@@ -15,6 +15,7 @@ class Player(pygame.sprite.Sprite):
         self.dust_frame_index = 0
         self.dust_animation_speed = 0.25
         self.display_surface = surface
+        self.create_jump_particles = create_jump_particles
 
         self.direction = pygame.math.Vector2(0, 0)
         self.speed = 8
@@ -73,15 +74,17 @@ class Player(pygame.sprite.Sprite):
             if self.dust_frame_index >= len(self.dust_run_particles):
                 self.dust_frame_index = 0
 
-        dust_particle = self.dust_run_particles[int(self.dust_frame_index)]
+            dust_particle = self.dust_run_particles[int(self.dust_frame_index)]
 
-        if self.facing_right:
-            pos = self.rect.bottomleft - pygame.math.Vector2(6, 10)
-            self.display_surface.blit(dust_particle, pos)
-        else:
-            pos = self.rect.bottomright - pygame.math.Vector2(6, 10)
-            flipped_dust_partilce = pygame.transform.flip(dust_particle, True, False)
-            self.display_surface.blit(flipped_dust_partilce, pos)
+            if self.facing_right:
+                pos = self.rect.bottomleft - pygame.math.Vector2(6, 10)
+                self.display_surface.blit(dust_particle, pos)
+            else:
+                pos = self.rect.bottomright - pygame.math.Vector2(6, 10)
+                flipped_dust_partilce = pygame.transform.flip(
+                    dust_particle, True, False
+                )
+                self.display_surface.blit(flipped_dust_partilce, pos)
 
     def get_input(self):
         keys = pygame.key.get_pressed()
@@ -97,6 +100,7 @@ class Player(pygame.sprite.Sprite):
 
         if keys[pygame.K_SPACE] and self.on_ground:
             self.jump()
+            self.create_jump_particles(self.rect.midbottom)
 
     def get_status(self):
         if self.direction.y < 0:
